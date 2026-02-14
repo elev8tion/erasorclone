@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create File with Document & Diagram</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+    button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      cursor: pointer;
+      font-size: 18px;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+    button:hover {
+      background: #0052a3;
+    }
+    button.secondary {
+      background: #6c757d;
+    }
+    button.secondary:hover {
+      background: #5a6268;
+    }
+    #status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 4px;
+      display: none;
+    }
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Create File with Both Document & Visual Diagram</h1>
+
+  <div class="info">
+    <strong>Note:</strong> This tool creates BOTH the text document (left panel) AND the visual diagram (right panel) together.
+    Simply provide the file name and content structure, and both will be generated automatically.
+  </div>
+
+  <div class="form-group">
+    <label for="fileName">File Name:</label>
+    <input type="text" id="fileName" placeholder="e.g., test1, my-project, database-schema" />
+  </div>
+
+  <div class="form-group">
+    <label for="contentJson">Document Content (JSON format):</label>
+    <textarea id="contentJson" placeholder='Paste EditorJS JSON content here...'></textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="diagramJson">Visual Diagram Data (JSON format - optional, will be auto-generated if empty):</label>
+    <textarea id="diagramJson" placeholder='Paste Excalidraw elements JSON here, or leave empty to auto-generate...'></textarea>
+  </div>
+
+  <div>
+    <button onclick="createFileWithBoth()">Create File with Both Panels</button>
+    <button class="secondary" onclick="updateExistingFile()">Update Existing File</button>
+  </div>
+
+  <div id="status"></div>
+
+  <script>
+    // Store this globally for Claude to call
+    window.createCompleteFile = function(fileName, documentBlocks, diagramElements) {
+      try {
+        const teamStr = localStorage.getItem('erasor_current_team');
+        if (!teamStr) {
+          showStatus('Please visit the dashboard first to initialize the app!', 'error');
+          return false;
+        }
+
+        const team = JSON.parse(teamStr);
+        const filesStr = localStorage.getItem('erasor_files') || '[]';
+        const files = JSON.parse(filesStr);
+
+        // Check if file already exists
+        const existingIndex = files.findIndex(f => f.fileName === fileName);
+
+        // Create document structure
+        const documentContent = {
+          time: Date.now(),
+          blocks: documentBlocks,
+          version: '2.8.1'
+        };
+
+        const fileData = {
+          fileName: fileName,
+          teamId: team._id,
+          createdBy: 'local@erasor.app',
+          archive: false,
+          document: JSON.stringify(documentContent),
+          whiteboard: JSON.stringify(diagramElements || []),
+          _creationTime: Date.now()
+        };
+
+        if (existingIndex !== -1) {
+          // Update existing file
+          files[existingIndex] = {
+            ...files[existingIndex],
+            ...fileData,
+            _id: files[existingIndex]._id
+          };
+          localStorage.setItem('erasor_files', JSON.stringify(files));
+          showStatus(`Success! Updated "${fileName}" with both document and diagram. Go to dashboard to see it!`, 'success');
+          return files[existingIndex];
+        } else {
+          // Create new file
+          const newFile = {
+            _id: Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            ...fileData
+          };
+
+          files.push(newFile);
+          localStorage.setItem('erasor_files', JSON.stringify(files));
+          showStatus(`Success! Created "${fileName}" with both document and diagram. Go to dashboard to see it!`, 'success');
+          return newFile;
+        }
+      } catch (error) {
+        showStatus('Error: ' + error.message, 'error');
+        console.error('Full error:', error);
+        return null;
+      }
+    };
+
+    function createFileWithBoth() {
+      try {
+        const fileName = document.getElementById('fileName').value.trim();
+        const contentJson = document.getElementById('contentJson').value.trim();
+        const diagramJson = document.getElementById('diagramJson').value.trim();
+
+        if (!fileName) {
+          showStatus('Please enter a file name!', 'error');
+          return;
+        }
+
+        if (!contentJson) {
+          showStatus('Please provide document content!', 'error');
+          return;
+        }
+
+        // Parse the inputs
+        const documentData = JSON.parse(contentJson);
+        const diagramData = diagramJson ? JSON.parse(diagramJson) : [];
+
+        // Extract blocks if full EditorJS format provided
+        const blocks = documentData.blocks || documentData;
+
+        // Create the file
+        const result = window.createCompleteFile(fileName, blocks, diagramData);
+
+        if (result) {
+          console.log('Created file:', result);
+        }
+
+      } catch (error) {
+        showStatus('Error: ' + error.message, 'error');
+        console.error('Full error:', error);
+      }
+    }
+
+    function updateExistingFile() {
+      // Same as create, but the function handles both cases
+      createFileWithBoth();
+    }
+
+    function showStatus(message, type) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = message;
+      statusDiv.className = type;
+      statusDiv.style.display = 'block';
+    }
+
+    // Example usage function for testing
+    function loadExample() {
+      const exampleDoc = {
+        blocks: [
+          { id: 'h1', type: 'header', data: { text: 'Example Document', level: 1 }},
+          { id: 'p1', type: 'paragraph', data: { text: 'This is example content.' }}
+        ]
+      };
+
+      document.getElementById('fileName').value = 'example-file';
+      document.getElementById('contentJson').value = JSON.stringify(exampleDoc, null, 2);
+    }
+  </script>
+</body>
+</html>

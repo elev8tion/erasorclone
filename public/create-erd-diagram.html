@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create ERD Diagram</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      cursor: pointer;
+      font-size: 18px;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #0052a3;
+    }
+    #status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 4px;
+      display: none;
+    }
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+  <h1>Create Visual ERD Diagram on Canvas</h1>
+  <p>Click the button to create a visual Entity Relationship Diagram on the canvas for the Pawn Shop database.</p>
+  <button onclick="createERDDiagram()">Create Visual ERD Diagram</button>
+  <div id="status"></div>
+
+  <script>
+    function createERDDiagram() {
+      try {
+        // Get files from localStorage
+        const filesStr = localStorage.getItem('erasor_files');
+        const files = JSON.parse(filesStr || '[]');
+
+        // Find test1 file
+        const test1Index = files.findIndex(f => f.fileName === 'test1');
+
+        if (test1Index === -1) {
+          showStatus('Error: test1 file not found!', 'error');
+          return;
+        }
+
+        // Create Excalidraw elements for ERD diagram
+        const elements = [];
+        let idCounter = 1;
+
+        // Helper to create rectangle
+        function createRect(x, y, width, height, text, isHeader = false) {
+          const id = `element_${idCounter++}`;
+          return {
+            type: "rectangle",
+            version: 1,
+            versionNonce: Math.floor(Math.random() * 1000000),
+            isDeleted: false,
+            id: id,
+            fillStyle: "solid",
+            strokeWidth: 2,
+            strokeStyle: "solid",
+            roughness: 0,
+            opacity: 100,
+            angle: 0,
+            x: x,
+            y: y,
+            strokeColor: isHeader ? "#1971c2" : "#1e1e1e",
+            backgroundColor: isHeader ? "#a5d8ff" : "#ffffff",
+            width: width,
+            height: height,
+            seed: Math.floor(Math.random() * 1000000),
+            groupIds: [],
+            frameId: null,
+            roundness: { type: 2 },
+            boundElements: [],
+            updated: Date.now(),
+            link: null,
+            locked: false
+          };
+        }
+
+        // Helper to create text
+        function createText(x, y, text, fontSize = 16, bold = false) {
+          const id = `text_${idCounter++}`;
+          return {
+            type: "text",
+            version: 1,
+            versionNonce: Math.floor(Math.random() * 1000000),
+            isDeleted: false,
+            id: id,
+            fillStyle: "solid",
+            strokeWidth: 2,
+            strokeStyle: "solid",
+            roughness: 0,
+            opacity: 100,
+            angle: 0,
+            x: x,
+            y: y,
+            strokeColor: "#1e1e1e",
+            backgroundColor: "transparent",
+            width: 200,
+            height: fontSize + 10,
+            seed: Math.floor(Math.random() * 1000000),
+            groupIds: [],
+            frameId: null,
+            roundness: null,
+            boundElements: [],
+            updated: Date.now(),
+            link: null,
+            locked: false,
+            fontSize: fontSize,
+            fontFamily: 1,
+            text: text,
+            textAlign: "left",
+            verticalAlign: "top",
+            containerId: null,
+            originalText: text,
+            lineHeight: 1.25
+          };
+        }
+
+        // Helper to create arrow
+        function createArrow(startX, startY, endX, endY, label = "") {
+          const id = `arrow_${idCounter++}`;
+          return {
+            type: "arrow",
+            version: 1,
+            versionNonce: Math.floor(Math.random() * 1000000),
+            isDeleted: false,
+            id: id,
+            fillStyle: "solid",
+            strokeWidth: 2,
+            strokeStyle: "solid",
+            roughness: 0,
+            opacity: 100,
+            angle: 0,
+            x: startX,
+            y: startY,
+            strokeColor: "#1971c2",
+            backgroundColor: "transparent",
+            width: Math.abs(endX - startX),
+            height: Math.abs(endY - startY),
+            seed: Math.floor(Math.random() * 1000000),
+            groupIds: [],
+            frameId: null,
+            roundness: { type: 2 },
+            boundElements: [],
+            updated: Date.now(),
+            link: null,
+            locked: false,
+            startBinding: null,
+            endBinding: null,
+            lastCommittedPoint: null,
+            startArrowhead: null,
+            endArrowhead: "arrow",
+            points: [[0, 0], [endX - startX, endY - startY]]
+          };
+        }
+
+        // Create USERS table (top left)
+        const usersX = 50;
+        const usersY = 50;
+        elements.push(createRect(usersX, usersY, 250, 40, "", true));
+        elements.push(createText(usersX + 10, usersY + 10, "USERS", 18, true));
+        elements.push(createRect(usersX, usersY + 40, 250, 180, ""));
+        elements.push(createText(usersX + 10, usersY + 50, "id (PK)", 14));
+        elements.push(createText(usersX + 10, usersY + 70, "username", 14));
+        elements.push(createText(usersX + 10, usersY + 90, "email", 14));
+        elements.push(createText(usersX + 10, usersY + 110, "password", 14));
+        elements.push(createText(usersX + 10, usersY + 130, "firstName", 14));
+        elements.push(createText(usersX + 10, usersY + 150, "lastName", 14));
+        elements.push(createText(usersX + 10, usersY + 170, "role", 14));
+        elements.push(createText(usersX + 10, usersY + 190, "profileImage", 14));
+
+        // Create PAWN_REQUEST table (top right)
+        const pawnX = 400;
+        const pawnY = 50;
+        elements.push(createRect(pawnX, pawnY, 280, 40, "", true));
+        elements.push(createText(pawnX + 10, pawnY + 10, "PAWN_REQUEST", 18, true));
+        elements.push(createRect(pawnX, pawnY + 40, 280, 180, ""));
+        elements.push(createText(pawnX + 10, pawnY + 50, "pawnId (PK)", 14));
+        elements.push(createText(pawnX + 10, pawnY + 70, "user_id (FK)", 14));
+        elements.push(createText(pawnX + 10, pawnY + 90, "itemName", 14));
+        elements.push(createText(pawnX + 10, pawnY + 110, "description", 14));
+        elements.push(createText(pawnX + 10, pawnY + 130, "photos", 14));
+        elements.push(createText(pawnX + 10, pawnY + 150, "offeredAmount", 14));
+        elements.push(createText(pawnX + 10, pawnY + 170, "status", 14));
+        elements.push(createText(pawnX + 10, pawnY + 190, "createdAt", 14));
+
+        // Create LOAN table (middle right)
+        const loanX = 400;
+        const loanY = 300;
+        elements.push(createRect(loanX, loanY, 280, 40, "", true));
+        elements.push(createText(loanX + 10, loanY + 10, "LOAN", 18, true));
+        elements.push(createRect(loanX, loanY + 40, 280, 160, ""));
+        elements.push(createText(loanX + 10, loanY + 50, "loanId (PK)", 14));
+        elements.push(createText(loanX + 10, loanY + 70, "pawn_id (FK)", 14));
+        elements.push(createText(loanX + 10, loanY + 90, "loanAmount", 14));
+        elements.push(createText(loanX + 10, loanY + 110, "interestRate", 14));
+        elements.push(createText(loanX + 10, loanY + 130, "dueDate", 14));
+        elements.push(createText(loanX + 10, loanY + 150, "status", 14));
+        elements.push(createText(loanX + 10, loanY + 170, "penalty", 14));
+
+        // Create NOTIFICATION table (bottom left)
+        const notifX = 50;
+        const notifY = 300;
+        elements.push(createRect(notifX, notifY, 250, 40, "", true));
+        elements.push(createText(notifX + 10, notifY + 10, "NOTIFICATION", 18, true));
+        elements.push(createRect(notifX, notifY + 40, 250, 120, ""));
+        elements.push(createText(notifX + 10, notifY + 50, "notifId (PK)", 14));
+        elements.push(createText(notifX + 10, notifY + 70, "user_id (FK)", 14));
+        elements.push(createText(notifX + 10, notifY + 90, "message", 14));
+        elements.push(createText(notifX + 10, notifY + 110, "type", 14));
+        elements.push(createText(notifX + 10, notifY + 130, "read", 14));
+
+        // Create TRANSACTION_LOG table (bottom center)
+        const transX = 50;
+        const transY = 500;
+        elements.push(createRect(transX, transY, 280, 40, "", true));
+        elements.push(createText(transX + 10, transY + 10, "TRANSACTION_LOG", 18, true));
+        elements.push(createRect(transX, transY + 40, 280, 120, ""));
+        elements.push(createText(transX + 10, transY + 50, "id (PK)", 14));
+        elements.push(createText(transX + 10, transY + 70, "user_id (FK)", 14));
+        elements.push(createText(transX + 10, transY + 90, "loan_id (FK)", 14));
+        elements.push(createText(transX + 10, transY + 110, "type", 14));
+        elements.push(createText(transX + 10, transY + 130, "amount", 14));
+
+        // Create relationship arrows
+        // USERS -> PAWN_REQUEST (1:N)
+        elements.push(createArrow(300, 140, 400, 140));
+        elements.push(createText(320, 120, "1:N", 12));
+
+        // PAWN_REQUEST -> LOAN (1:1)
+        elements.push(createArrow(540, 230, 540, 300));
+        elements.push(createText(545, 250, "1:1", 12));
+
+        // USERS -> NOTIFICATION (1:N)
+        elements.push(createArrow(175, 220, 175, 300));
+        elements.push(createText(180, 250, "1:N", 12));
+
+        // USERS -> TRANSACTION_LOG (1:N)
+        elements.push(createArrow(175, 220, 175, 500));
+        elements.push(createText(180, 350, "1:N", 12));
+
+        // LOAN -> TRANSACTION_LOG (1:N)
+        elements.push(createArrow(400, 380, 330, 550));
+        elements.push(createText(350, 450, "1:N", 12));
+
+        // Update the file - Excalidraw expects just the elements array
+        files[test1Index].whiteboard = JSON.stringify(elements);
+        localStorage.setItem('erasor_files', JSON.stringify(files));
+
+        showStatus('Success! Visual ERD diagram created on canvas. Refresh the workspace to see it!', 'success');
+
+      } catch (error) {
+        showStatus('Error: ' + error.message, 'error');
+        console.error('Full error:', error);
+      }
+    }
+
+    function showStatus(message, type) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = message;
+      statusDiv.className = type;
+      statusDiv.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

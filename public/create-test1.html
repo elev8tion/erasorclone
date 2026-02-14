@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create test1 File</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      cursor: pointer;
+      font-size: 18px;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #0052a3;
+    }
+    #status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 4px;
+      display: none;
+    }
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+  <h1>Create/Update test1 File with ERD Content</h1>
+  <p>Click the button below to create or update the "test1" file with the complete Pawn Shop database ERD schema.</p>
+  <button id="createBtn" onclick="createTest1File()">Create test1 File with ERD</button>
+  <div id="status"></div>
+
+  <script>
+    function createTest1File() {
+      try {
+        // First, ensure we have a team
+        const teamStr = localStorage.getItem('erasor_current_team');
+        if (!teamStr) {
+          showStatus('Please visit the dashboard first to initialize the app!', 'error');
+          return;
+        }
+
+        const team = JSON.parse(teamStr);
+        
+        // Get existing files
+        const filesStr = localStorage.getItem('erasor_files') || '[]';
+        const files = JSON.parse(filesStr);
+        
+        // Check if test1 already exists
+        const existingIndex = files.findIndex(f => f.fileName === 'test1');
+        
+        // Create the ERD document content
+        const erdDocument = {
+          time: Date.now(),
+          blocks: [
+            {
+              id: 'h1',
+              type: 'header',
+              data: { text: 'Pawn Shop Management System - Database Schema', level: 1 }
+            },
+            {
+              id: 'h2',
+              type: 'header',
+              data: { text: 'Entity Relationship Diagram (ERD)', level: 2 }
+            },
+            {
+              id: 'p1',
+              type: 'paragraph',
+              data: { text: 'The database consists of 5 main tables: users, pawn_request, loan, notification, and transaction_log.' }
+            },
+            {
+              id: 'h3',
+              type: 'header',
+              data: { text: '1. USERS Table', level: 2 }
+            },
+            {
+              id: 'l1',
+              type: 'list',
+              data: {
+                style: 'unordered',
+                items: [
+                  'id (Long, PK) - Unique user identifier',
+                  'username (String) - Login username',
+                  'email (String) - User email address',
+                  'password (String) - Hashed password',
+                  'firstName (String) - User first name',
+                  'lastName (String) - User last name',
+                  'role (String) - USER or ADMIN',
+                  'profileImage (String) - URL to profile image',
+                  'enabled (Boolean) - Account active status'
+                ]
+              }
+            },
+            {
+              id: 'h4',
+              type: 'header',
+              data: { text: '2. PAWN_REQUEST Table', level: 2 }
+            },
+            {
+              id: 'l2',
+              type: 'list',
+              data: {
+                style: 'unordered',
+                items: [
+                  'pawnId (Long, PK) - Unique request identifier',
+                  'user_id (Long, FK) - Reference to USERS.id',
+                  'itemName (String) - Name of pawned item',
+                  'description (String) - Item description',
+                  'photos (String) - JSON/URL array of item photos',
+                  'offeredAmount (BigDecimal) - Amount offered by admin',
+                  'status (String) - PENDING/OFFER_MADE/ACCEPTED/PAWNED',
+                  'adminRemarks (String) - Admin notes on the item',
+                  'createdAt (LocalDateTime) - Request timestamp'
+                ]
+              }
+            },
+            {
+              id: 'h5',
+              type: 'header',
+              data: { text: '3. LOAN Table', level: 2 }
+            },
+            {
+              id: 'l3',
+              type: 'list',
+              data: {
+                style: 'unordered',
+                items: [
+                  'loanId (Long, PK) - Unique loan identifier',
+                  'pawn_id (Long, FK) - Reference to PAWN_REQUEST.pawnId',
+                  'loanAmount (BigDecimal) - Principal amount disbursed',
+                  'interestRate (Integer) - Interest rate percentage',
+                  'dueDate (LocalDate) - Loan repayment due date',
+                  'status (String) - ACTIVE/PAID/FORFEITED',
+                  'penalty (BigDecimal) - Late payment penalty amount',
+                  'dateRedeemed (LocalDate) - Date when item was redeemed'
+                ]
+              }
+            },
+            {
+              id: 'h6',
+              type: 'header',
+              data: { text: '4. NOTIFICATION Table', level: 2 }
+            },
+            {
+              id: 'l4',
+              type: 'list',
+              data: {
+                style: 'unordered',
+                items: [
+                  'notifId (Long, PK) - Unique notification identifier',
+                  'user_id (Long, FK) - Reference to USERS.id',
+                  'message (String) - Notification message text',
+                  'type (String) - Notification category',
+                  'read (Boolean) - Read/unread status',
+                  'timestamp (LocalDateTime) - When notification was created'
+                ]
+              }
+            },
+            {
+              id: 'h7',
+              type: 'header',
+              data: { text: '5. TRANSACTION_LOG Table', level: 2 }
+            },
+            {
+              id: 'l5',
+              type: 'list',
+              data: {
+                style: 'unordered',
+                items: [
+                  'id (Long, PK) - Unique transaction identifier',
+                  'user_id (Long, FK) - Reference to USERS.id',
+                  'loan_id (Long, FK) - Reference to LOAN.loanId',
+                  'type (String) - PAYMENT or DISBURSAL',
+                  'amount (BigDecimal) - Transaction amount',
+                  'timestamp (LocalDateTime) - Transaction timestamp'
+                ]
+              }
+            },
+            {
+              id: 'h8',
+              type: 'header',
+              data: { text: 'Key Relationships', level: 2 }
+            },
+            {
+              id: 'l6',
+              type: 'list',
+              data: {
+                style: 'ordered',
+                items: [
+                  'User to PawnRequest (1:N) - A single user can have multiple pawn requests',
+                  'PawnRequest to Loan (1:1) - A pawn request becomes exactly one Loan once validated',
+                  'Loan to TransactionLog (1:N) - A loan can have multiple associated transactions',
+                  'User to Notification (1:N) - Users receive multiple notifications',
+                  'User to TransactionLog (1:N) - Users have multiple transaction records'
+                ]
+              }
+            },
+            {
+              id: 'h9',
+              type: 'header',
+              data: { text: 'Business Rules', level: 2 }
+            },
+            {
+              id: 'c1',
+              type: 'checklist',
+              data: {
+                items: [
+                  { text: 'Default loan duration: 30 days from disbursement', checked: false },
+                  { text: 'Loan amount (loanAmount) is the final principal disbursed to user', checked: false },
+                  { text: 'Interest rate stored as percentage (e.g., 5 = 5%)', checked: false },
+                  { text: 'Penalties apply for overdue loans', checked: false },
+                  { text: 'Items can be forfeited if not redeemed by due date', checked: false }
+                ]
+              }
+            },
+            {
+              id: 'h10',
+              type: 'header',
+              data: { text: 'Implementation Steps', level: 2 }
+            },
+            {
+              id: 'l7',
+              type: 'list',
+              data: {
+                style: 'ordered',
+                items: [
+                  'Implement database migration scripts',
+                  'Create data access layer (repositories)',
+                  'Build REST API endpoints for each entity',
+                  'Implement business logic for pawn workflow',
+                  'Add validation and security layers',
+                  'Create admin dashboard UI',
+                  'Build customer mobile app'
+                ]
+              }
+            }
+          ],
+          version: '2.8.1'
+        };
+
+        if (existingIndex !== -1) {
+          // Update existing file
+          files[existingIndex].document = JSON.stringify(erdDocument);
+          localStorage.setItem('erasor_files', JSON.stringify(files));
+          showStatus('Success! Updated test1 file with ERD content. Go to dashboard to open it!', 'success');
+        } else {
+          // Create new file
+          const newFile = {
+            _id: Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            fileName: 'test1',
+            teamId: team._id,
+            createdBy: 'local@erasor.app',
+            archive: false,
+            document: JSON.stringify(erdDocument),
+            whiteboard: '',
+            _creationTime: Date.now()
+          };
+          
+          files.push(newFile);
+          localStorage.setItem('erasor_files', JSON.stringify(files));
+          showStatus('Success! Created test1 file with ERD content. Go to dashboard to see it!', 'success');
+        }
+        
+      } catch (error) {
+        showStatus('Error: ' + error.message, 'error');
+        console.error('Full error:', error);
+      }
+    }
+
+    function showStatus(message, type) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = message;
+      statusDiv.className = type;
+      statusDiv.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

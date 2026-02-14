@@ -1,0 +1,265 @@
+{
+  "time": 1702989600000,
+  "blocks": [
+    {
+      "id": "header1",
+      "type": "header",
+      "data": {
+        "text": "Pawn Shop Management System - Database Schema",
+        "level": 1
+      }
+    },
+    {
+      "id": "header2",
+      "type": "header",
+      "data": {
+        "text": "Entity Relationship Diagram (ERD)",
+        "level": 2
+      }
+    },
+    {
+      "id": "para1",
+      "type": "paragraph",
+      "data": {
+        "text": "The database consists of 5 main tables: users, pawn_request, loan, notification, and transaction_log."
+      }
+    },
+    {
+      "id": "header3",
+      "type": "header",
+      "data": {
+        "text": "Schema Overview",
+        "level": 2
+      }
+    },
+    {
+      "id": "code1",
+      "type": "paragraph",
+      "data": {
+        "text": "<b>Mermaid ERD:</b><br><br>erDiagram<br>&nbsp;&nbsp;&nbsp;&nbsp;USERS ||--o{ PAWN_REQUEST : \"initiates\"<br>&nbsp;&nbsp;&nbsp;&nbsp;USERS ||--o{ NOTIFICATION : \"receives\"<br>&nbsp;&nbsp;&nbsp;&nbsp;USERS ||--o{ TRANSACTION_LOG : \"has\"<br>&nbsp;&nbsp;&nbsp;&nbsp;PAWN_REQUEST ||--|{ LOAN : \"becomes\"<br>&nbsp;&nbsp;&nbsp;&nbsp;LOAN ||--o{ TRANSACTION_LOG : \"generates\""
+      }
+    },
+    {
+      "id": "header4",
+      "type": "header",
+      "data": {
+        "text": "1. USERS Table",
+        "level": 2
+      }
+    },
+    {
+      "id": "list1",
+      "type": "list",
+      "data": {
+        "style": "unordered",
+        "items": [
+          "<b>id</b> (Long, PK) - Unique user identifier",
+          "<b>username</b> (String) - Login username",
+          "<b>email</b> (String) - User email address",
+          "<b>password</b> (String) - Hashed password",
+          "<b>firstName</b> (String) - User's first name",
+          "<b>lastName</b> (String) - User's last name",
+          "<b>role</b> (String) - USER or ADMIN",
+          "<b>profileImage</b> (String) - URL to profile image",
+          "<b>enabled</b> (Boolean) - Account active status"
+        ]
+      }
+    },
+    {
+      "id": "header5",
+      "type": "header",
+      "data": {
+        "text": "2. PAWN_REQUEST Table",
+        "level": 2
+      }
+    },
+    {
+      "id": "list2",
+      "type": "list",
+      "data": {
+        "style": "unordered",
+        "items": [
+          "<b>pawnId</b> (Long, PK) - Unique request identifier",
+          "<b>user_id</b> (Long, FK) - Reference to USERS.id",
+          "<b>itemName</b> (String) - Name of pawned item",
+          "<b>description</b> (String) - Item description",
+          "<b>photos</b> (String) - JSON/URL array of item photos",
+          "<b>offeredAmount</b> (BigDecimal) - Amount offered by admin",
+          "<b>status</b> (String) - PENDING/OFFER_MADE/ACCEPTED/PAWNED",
+          "<b>adminRemarks</b> (String) - Admin notes on the item",
+          "<b>createdAt</b> (LocalDateTime) - Request timestamp"
+        ]
+      }
+    },
+    {
+      "id": "header6",
+      "type": "header",
+      "data": {
+        "text": "3. LOAN Table",
+        "level": 2
+      }
+    },
+    {
+      "id": "list3",
+      "type": "list",
+      "data": {
+        "style": "unordered",
+        "items": [
+          "<b>loanId</b> (Long, PK) - Unique loan identifier",
+          "<b>pawn_id</b> (Long, FK) - Reference to PAWN_REQUEST.pawnId",
+          "<b>loanAmount</b> (BigDecimal) - Principal amount disbursed",
+          "<b>interestRate</b> (Integer) - Interest rate percentage",
+          "<b>dueDate</b> (LocalDate) - Loan repayment due date",
+          "<b>status</b> (String) - ACTIVE/PAID/FORFEITED",
+          "<b>penalty</b> (BigDecimal) - Late payment penalty amount",
+          "<b>dateRedeemed</b> (LocalDate) - Date when item was redeemed"
+        ]
+      }
+    },
+    {
+      "id": "header7",
+      "type": "header",
+      "data": {
+        "text": "4. NOTIFICATION Table",
+        "level": 2
+      }
+    },
+    {
+      "id": "list4",
+      "type": "list",
+      "data": {
+        "style": "unordered",
+        "items": [
+          "<b>notifId</b> (Long, PK) - Unique notification identifier",
+          "<b>user_id</b> (Long, FK) - Reference to USERS.id",
+          "<b>message</b> (String) - Notification message text",
+          "<b>type</b> (String) - Notification category",
+          "<b>read</b> (Boolean) - Read/unread status",
+          "<b>timestamp</b> (LocalDateTime) - When notification was created"
+        ]
+      }
+    },
+    {
+      "id": "header8",
+      "type": "header",
+      "data": {
+        "text": "5. TRANSACTION_LOG Table",
+        "level": 2
+      }
+    },
+    {
+      "id": "list5",
+      "type": "list",
+      "data": {
+        "style": "unordered",
+        "items": [
+          "<b>id</b> (Long, PK) - Unique transaction identifier",
+          "<b>user_id</b> (Long, FK) - Reference to USERS.id",
+          "<b>loan_id</b> (Long, FK) - Reference to LOAN.loanId",
+          "<b>type</b> (String) - PAYMENT or DISBURSAL",
+          "<b>amount</b> (BigDecimal) - Transaction amount",
+          "<b>timestamp</b> (LocalDateTime) - Transaction timestamp"
+        ]
+      }
+    },
+    {
+      "id": "header9",
+      "type": "header",
+      "data": {
+        "text": "Key Relationships",
+        "level": 2
+      }
+    },
+    {
+      "id": "list6",
+      "type": "list",
+      "data": {
+        "style": "ordered",
+        "items": [
+          "<b>User to PawnRequest (1:N)</b> - A single user can have multiple pawn requests",
+          "<b>PawnRequest to Loan (1:1)</b> - A pawn request becomes exactly one Loan once validated",
+          "<b>Loan to TransactionLog (1:N)</b> - A loan can have multiple associated transactions",
+          "<b>User to Notification (1:N)</b> - Users receive multiple notifications",
+          "<b>User to TransactionLog (1:N)</b> - Users have multiple transaction records"
+        ]
+      }
+    },
+    {
+      "id": "header10",
+      "type": "header",
+      "data": {
+        "text": "Data Dictionary - Key Fields",
+        "level": 2
+      }
+    },
+    {
+      "id": "warn1",
+      "type": "warning",
+      "data": {
+        "title": "Important Status Fields",
+        "message": "PAWN_REQUEST.status: PENDING → OFFER_MADE (Admin sets price) → ACCEPTED (User agrees) → PAWNED (Item in custody)<br><br>LOAN.status: ACTIVE → PAID (Redeemed) or FORFEITED (Not redeemed)"
+      }
+    },
+    {
+      "id": "header11",
+      "type": "header",
+      "data": {
+        "text": "Business Rules",
+        "level": 2
+      }
+    },
+    {
+      "id": "check1",
+      "type": "checklist",
+      "data": {
+        "items": [
+          {
+            "text": "Default loan duration: 30 days from disbursement",
+            "checked": false
+          },
+          {
+            "text": "Loan amount (loanAmount) is the final principal disbursed to user",
+            "checked": false
+          },
+          {
+            "text": "Interest rate stored as percentage (e.g., 5 = 5%)",
+            "checked": false
+          },
+          {
+            "text": "Penalties apply for overdue loans",
+            "checked": false
+          },
+          {
+            "text": "Items can be forfeited if not redeemed by due date",
+            "checked": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "header12",
+      "type": "header",
+      "data": {
+        "text": "Next Steps",
+        "level": 2
+      }
+    },
+    {
+      "id": "list7",
+      "type": "list",
+      "data": {
+        "style": "ordered",
+        "items": [
+          "Implement database migration scripts",
+          "Create data access layer (repositories)",
+          "Build REST API endpoints for each entity",
+          "Implement business logic for pawn workflow",
+          "Add validation and security layers",
+          "Create admin dashboard UI",
+          "Build customer mobile app"
+        ]
+      }
+    }
+  ],
+  "version": "2.8.1"
+}
