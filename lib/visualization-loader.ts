@@ -36,8 +36,6 @@ export interface EditorJSData {
 export interface VisualizationFile {
   _id: string;
   fileName: string;
-  teamId: string;
-  createdBy: string;
   archive: boolean;
   document: string; // JSON stringified EditorJSData
   whiteboard: string; // JSON stringified ExcalidrawData
@@ -118,9 +116,7 @@ export function parseDocumentData(documentString: string): EditorJSData {
 export function createVisualizationFile(
   fileName: string,
   documentBlocks: EditorJSBlock[],
-  diagramElements: ExcalidrawElement[],
-  teamId: string,
-  createdBy: string
+  diagramElements: ExcalidrawElement[]
 ): VisualizationFile {
   const now = Date.now();
   const id = `${now}_${Math.random().toString(36).substr(2, 9)}`;
@@ -137,8 +133,6 @@ export function createVisualizationFile(
   return {
     _id: id,
     fileName,
-    teamId,
-    createdBy,
     archive: false,
     document: JSON.stringify(editorData),
     whiteboard: JSON.stringify(excalidrawData),
@@ -152,7 +146,7 @@ export function createVisualizationFile(
 export function validateVisualizationFile(file: any): file is VisualizationFile {
   if (!file || typeof file !== 'object') return false;
 
-  const required = ['_id', 'fileName', 'teamId', 'createdBy', 'document', 'whiteboard'];
+  const required = ['_id', 'fileName', 'document', 'whiteboard'];
   for (const field of required) {
     if (!(field in file)) return false;
   }
@@ -194,7 +188,7 @@ export function loadVisualizationFiles(files: VisualizationFile[]): {
       return true;
     } else {
       failed++;
-      errors.push(`Invalid file: ${file.fileName || 'unknown'}`);
+      errors.push(`Invalid file: ${(file as any).fileName || 'unknown'}`);
       return false;
     }
   });

@@ -20,7 +20,7 @@ function Canvas({onSaveTrigger,fileId,fileData}:{onSaveTrigger:any,fileId:any,fi
    {fileData&& <Excalidraw
     theme='dark'
     initialData={
-        fileData?.whiteboard ? parseWhiteboardData(fileData.whiteboard) : { elements: [], appState: { viewBackgroundColor: "#ffffff" } }
+        (fileData?.whiteboard ? parseWhiteboardData(fileData.whiteboard) : { elements: [], appState: { viewBackgroundColor: "#ffffff" } }) as any
     }
     onChange={(excalidrawElements, appState, files)=>
         setWhiteBoardData(excalidrawElements)}

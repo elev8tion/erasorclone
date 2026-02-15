@@ -12,10 +12,8 @@ import { useRouter } from 'next/navigation';
 
 export interface FILE{
   archive:boolean,
-  createdBt:string,
   document:string,
   fileName:string,
-  teamId:string,
   whiteboard:string,
   _id:string,
   _creationTime:number
@@ -41,7 +39,6 @@ function FileList() {
       <td className="whitespace-nowrap px-4 py-2 font-medium text-foreground">File Name</td>
       <td className="whitespace-nowrap px-4 py-2 font-medium text-foreground">Created At</td>
       <td className="whitespace-nowrap px-4 py-2 font-medium text-foreground">Edited</td>
-      <td className="whitespace-nowrap px-4 py-2 font-medium text-foreground">Author</td>
 
       </tr>
     </thead>
@@ -57,9 +54,6 @@ function FileList() {
           {moment(file._creationTime).format('DD MMM YYYY')} </td>
         <td className="whitespace-nowrap px-4 py-2 text-muted-foreground">
         {moment(file._creationTime).format('DD MMM YYYY')}
-        </td>
-        <td className="whitespace-nowrap px-4 py-2 text-muted-foreground">
-          Local User
         </td>
         <td className="whitespace-nowrap px-4 py-2 text-muted-foreground">
          
