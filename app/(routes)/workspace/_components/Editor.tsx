@@ -6,7 +6,7 @@ import Header from '@editorjs/header';
 // @ts-ignore
 import List from "@editorjs/list";
 // @ts-ignore
-import Checklist from '@editorjs/checklist'
+import ChecklistBase from '@editorjs/checklist'
 // @ts-ignore
 import Paragraph from '@editorjs/paragraph';
 // @ts-ignore
@@ -14,6 +14,16 @@ import Warning from '@editorjs/warning';
 import { toast } from 'sonner';
 import { FILE } from '../../dashboard/_components/FileList';
 import { updateDocument as updateDocumentDB } from '@/lib/localdb';
+
+// Patched checklist — upstream 1.6.0 crashes on null querySelector in toggleCheckbox
+// @ts-ignore
+class Checklist extends ChecklistBase {
+  toggleCheckbox(e: MouseEvent) {
+    const item = (e.target as HTMLElement).closest(`.cdx-checklist__item`);
+    if (!item) return;
+    super.toggleCheckbox(e);
+  }
+}
 
 const rawDocument={
     "time" : 1550476186479,
@@ -68,7 +78,7 @@ function Editor({onSaveTrigger,fileId,fileData}:{onSaveTrigger:any,fileId:any,fi
                     }
                   },
                   checklist: {
-                    class: Checklist,
+                    class: Checklist as any,
                     inlineToolbar: true,
                   },
                   paragraph: Paragraph,
